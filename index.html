@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a1a2e">
+    <title>Formentis Speak</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #4A90E2;
+            --bg: #1a1a2e;
+            --card-bg: #16213e;
+            --text: #ffffff;
+            --text-light: #a0a0b0;
+            --border: #2a2a4a;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container { max-width: 500px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 30px; }
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, #4A90E2, #67B26F);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        .subtitle { color: var(--text-light); font-size: 1rem; }
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            background: #0f3460;
+            color: white;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+            margin-bottom: 12px;
+        }
+        textarea:focus { outline: none; border-color: var(--primary); }
+        textarea::placeholder { color: #6a6a8a; }
+        .btn-row { display: flex; gap: 8px; margin-bottom: 10px; }
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            flex: 1;
+            color: white;
+            transition: all 0.3s;
+        }
+        .btn:active { transform: scale(0.95); }
+        .btn-primary { background: linear-gradient(45deg, #4A90E2, #67B26F); font-size: 18px; }
+        .btn-secondary { background: #2a2a4a; }
+        .btn-control { background: #2a2a4a; padding: 15px; font-size: 16px; }
+        .btn-large { padding: 18px 30px; font-size: 20px; flex: 2; }
+        .speed-row { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+        .speed-row label { color: var(--text-light); }
+        #speedValue { color: #4A90E2; font-weight: 700; }
+        .speed-presets { display: flex; gap: 8px; }
+        .speed-btn {
+            flex: 1; padding: 8px; border: 2px solid var(--border);
+            background: transparent; color: white; border-radius: 10px;
+            cursor: pointer; font-weight: 600;
+        }
+        .speed-btn.active { background: linear-gradient(45deg, #4A90E2, #67B26F); border-color: transparent; }
+        .playback { display: flex; gap: 12px; align-items: center; justify-content: center; margin: 20px 0; }
+        .time-row { display: flex; justify-content: space-between; font-size: 14px; color: var(--text-light); margin-bottom: 5px; }
+        input[type="range"] {
+            width: 100%; margin: 10px 0; -webkit-appearance: none;
+            appearance: none; height: 8px; background: #2a2a4a; border-radius: 4px;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none;
+            width: 24px; height: 24px;
+            background: linear-gradient(45deg, #4A90E2, #67B26F);
+            border-radius: 50%; cursor: pointer;
+        }
+        .history-section { background: var(--card-bg); border-radius: 16px; padding: 20px; }
+        .history-section h2 { margin-bottom: 16px; }
+        .history-list { max-height: 300px; overflow-y: auto; margin-bottom: 12px; }
+        .empty-state { text-align: center; color: var(--text-light); padding: 20px; }
+        .history-item {
+            background: #0f3460; border-radius: 12px; padding: 16px;
+            margin-bottom: 8px; cursor: pointer; border-left: 4px solid #4A90E2;
+        }
+        .history-item:active { background: #1a1a4e; transform: translateX(5px); }
+        .history-item .preview { font-size: 14px; margin-bottom: 4px; line-height: 1.4; }
+        .history-item .meta { font-size: 12px; color: var(--text-light); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎙️ Formentis Speak</h1>
+            <p class="subtitle">Ascolta i tuoi testi mentre guidi</p>
+        </header>
+
+        <div class="card">
+            <textarea id="textInput" placeholder="Incolla qui il tuo testo..."></textarea>
+            <div class="btn-row">
+                <button class="btn btn-secondary" onclick="pasteText()">📋 Incolla</button>
+                <button class="btn btn-secondary" onclick="clearText()">🗑️ Pulisci</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="speed-row">
+                <label>Velocità: <span id="speedValue">1.0x</span></label>
+            </div>
+            <input type="range" id="speedSlider" min="0.5" max="3" step="0.1" value="1" oninput="updateSpeed(this.value)">
+            <div class="speed-presets">
+                <button class="speed-btn" onclick="setSpeed(0.75)">0.75x</button>
+                <button class="speed-btn active" onclick="setSpeed(1)">1x</button>
+                <button class="speed-btn" onclick="setSpeed(1.5)">1.5x</button>
+                <button class="speed-btn" onclick="setSpeed(2)">2x</button>
+            </div>
+
+            <div class="playback">
+                <button class="btn btn-control" onclick="skip(-10)">⏪ -10s</button>
+                <button class="btn btn-primary btn-large" id="playBtn" onclick="togglePlay()">▶️ Ascolta</button>
+                <button class="btn btn-control" onclick="skip(10)">⏩ +10s</button>
+            </div>
+
+            <div class="time-row">
+                <span id="currentTime">00:00</span>
+                <span id="totalTime">00:00</span>
+            </div>
+            <input type="range" id="progressSlider" min="0" max="100" value="0" onchange="seekTo(this.value)">
+        </div>
+
+        <div class="history-section">
+            <h2>📚 Cronologia</h2>
+            <div class="history-list" id="historyList">
+                <p class="empty-state">Nessun testo ascoltato</p>
+            </div>
+            <button class="btn btn-secondary" onclick="clearHistory()">🗑️ Pulisci cronologia</button>
+        </div>
+    </div>
+
+    <script>
+        let synth = window.speechSynthesis;
+        let utterance = null;
+        let isPlaying = false;
+        let currentSpeed = 1;
+        let currentText = '';
+        let progressInterval = null;
+        let currentProgress = 0;
+
+        // Carica voci
+        function loadVoices() {
+            synth.getVoices();
+            synth.onvoiceschanged = () => synth.getVoices();
+        }
+        loadVoices();
+
+        // Carica cronologia
+        let history = JSON.parse(localStorage.getItem('formentisHistory') || '[]');
+        renderHistory();
+
+        async function pasteText() {
+            try {
+                const text = await navigator.clipboard.readText();
+                if (text) {
+                    document.getElementById('textInput').value = text;
+                }
+            } catch {
+                alert('Incolla manualmente il testo');
+            }
+        }
+
+        function clearText() {
+            document.getElementById('textInput').value = '';
+        }
+
+        function updateSpeed(value) {
+            currentSpeed = parseFloat(value);
+            document.getElementById('speedValue').textContent = currentSpeed.toFixed(1) + 'x';
+            
+            document.querySelectorAll('.speed-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (parseFloat(btn.textContent) === currentSpeed) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        function setSpeed(speed) {
+            document.getElementById('speedSlider').value = speed;
+            updateSpeed(speed);
+        }
+
+        function togglePlay() {
+            if (isPlaying) {
+                stopPlayback();
+            } else {
+                startPlayback();
+            }
+        }
+
+        function startPlayback() {
+            const text = document.getElementById('textInput').value.trim();
+            if (!text) {
+                alert('Inserisci del testo da ascoltare');
+                return;
+            }
+
+            synth.cancel();
+            currentText = text;
+            utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = currentSpeed;
+            utterance.lang = 'it-IT';
+
+            const voices = synth.getVoices();
+            const italianVoice = voices.find(v => v.lang.startsWith('it'));
+            if (italianVoice) utterance.voice = italianVoice;
+
+            utterance.onstart = () => {
+                isPlaying = true;
+                document.getElementById('playBtn').innerHTML = '⏸️ Pausa';
+                startProgress();
+            };
+
+            utterance.onend = () => {
+                stopPlayback();
+                addToHistory(text);
+            };
+
+            utterance.onerror = () => {
+                stopPlayback();
+            };
+
+            synth.speak(utterance);
+        }
+
+        function stopPlayback() {
+            synth.cancel();
+            isPlaying = false;
+            document.getElementById('playBtn').innerHTML = '▶️ Ascolta';
+            if (progressInterval) clearInterval(progressInterval);
+        }
+
+        function skip(seconds) {
+            if (!isPlaying || !currentText) return;
+            
+            const words = currentText.split(' ');
+            const skipWords = Math.abs(Math.floor(seconds * 2.5));
+            let remainingText;
+            
+            if (seconds > 0) {
+                // Avanza: prendi le parole rimanenti
+                const currentWordIndex = Math.floor((currentProgress / 100) * words.length);
+                const newStart = Math.min(currentWordIndex + skipWords, words.length);
+                remainingText = words.slice(newStart).join(' ');
+            }
+            
+            stopPlayback();
+            if (remainingText) {
+                document.getElementById('textInput').value = remainingText;
+                setTimeout(() => startPlayback(), 50);
+            }
+        }
+
+        function startProgress() {
+            const totalDuration = estimateDuration();
+            document.getElementById('totalTime').textContent = formatTime(totalDuration);
+            
+            let elapsed = 0;
+            progressInterval = setInterval(() => {
+                elapsed += 1;
+                currentProgress = Math.min((elapsed / totalDuration) * 100, 100);
+                document.getElementById('progressSlider').value = currentProgress;
+                document.getElementById('currentTime').textContent = formatTime(elapsed);
+            }, 1000);
+        }
+
+        function estimateDuration() {
+            const words = currentText.split(/\s+/).length;
+            return Math.max((words / 150) * 60 / currentSpeed, 1);
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function seekTo(percent) {
+            if (!currentText) return;
+            const charIndex = Math.floor((percent / 100) * currentText.length);
+            const remainingText = currentText.substring(charIndex);
+            document.getElementById('textInput').value = remainingText;
+            
+            if (isPlaying) {
+                stopPlayback();
+                setTimeout(() => startPlayback(), 50);
+            }
+        }
+
+        function addToHistory(text) {
+            const entry = {
+                id: Date.now(),
+                text: text,
+                preview: text.substring(0, 100) + (text.length > 100 ? '...' : ''),
+                timestamp: new Date().toLocaleString('it-IT'),
+                speed: currentSpeed
+            };
+            
+            history.unshift(entry);
+            if (history.length > 50) history = history.slice(0, 50);
+            
+            localStorage.setItem('formentisHistory', JSON.stringify(history));
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('historyList');
+            
+            if (history.length === 0) {
+                container.innerHTML = '<p class="empty-state">Nessun testo ascoltato</p>';
+                return;
+            }
+            
+            container.innerHTML = history.map((item, index) => `
+                <div class="history-item" onclick="loadFromHistory(${index})">
+                    <div class="preview">${item.preview}</div>
+                    <div class="meta">${item.timestamp} • ${item.speed.toFixed(1)}x</div>
+                </div>
+            `).join('');
+        }
+
+        function loadFromHistory(index) {
+            document.getElementById('textInput').value = history[index].text;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function clearHistory() {
+            if (confirm('Cancellare tutta la cronologia?')) {
+                history = [];
+                localStorage.removeItem('formentisHistory');
+                renderHistory();
+            }
+        }
+    </script>
+</body>
+</html>
