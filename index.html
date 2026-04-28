@@ -5,183 +5,738 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#1a1a2e">
+    <meta name="theme-color" content="#0f0f1a">
     <title>Formentis Speak</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
         :root {
-            --primary: #4A90E2;
-            --bg: #1a1a2e;
-            --card-bg: #16213e;
+            --bg-primary: #0f0f1a;
+            --bg-card: #1a1a2e;
+            --bg-input: #16213e;
+            --accent: #6c5ce7;
+            --accent-light: #a855f7;
             --text: #ffffff;
-            --text-light: #a0a0b0;
+            --text-secondary: #a0a0c0;
             --border: #2a2a4a;
+            --danger: #ef4444;
+            --success: #10b981;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --glass: rgba(255, 255, 255, 0.05);
+            --radius: 20px;
+            --radius-sm: 12px;
         }
+
+        /* FIX IPHONE SAFE AREA */
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--bg);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
             color: var(--text);
-            padding: 20px;
             min-height: 100vh;
+            min-height: -webkit-fill-available;
+            -webkit-font-smoothing: antialiased;
+            
+            /* Safe area padding per iPhone X e successivi */
+            padding-top: max(16px, env(safe-area-inset-top));
+            padding-bottom: max(16px, env(safe-area-inset-bottom));
+            padding-left: max(16px, env(safe-area-inset-left));
+            padding-right: max(16px, env(safe-area-inset-right));
         }
-        .container { max-width: 500px; margin: 0 auto; }
-        header { text-align: center; margin-bottom: 30px; }
+
+        .container { 
+            max-width: 520px; 
+            margin: 0 auto;
+            height: 100%;
+        }
+
+        /* Header - ora centrato verticalmente */
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 20px 20px 10px;
+        }
+
+        .logo {
+            width: 65px;
+            height: 65px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-size: 32px;
+            box-shadow: 0 10px 30px rgba(108, 92, 231, 0.3);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+        }
+
         h1 {
-            font-size: 2.5rem;
-            background: linear-gradient(45deg, #4A90E2, #67B26F);
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a855f7, #6c5ce7, #8b5cf6);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            margin-bottom: 4px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 400;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 18px;
+            margin-bottom: 14px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Textarea */
+        .textarea-wrapper {
+            position: relative;
             margin-bottom: 10px;
         }
-        .subtitle { color: var(--text-light); font-size: 1rem; }
-        .card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-        }
+
         textarea {
             width: 100%;
-            height: 200px;
-            background: #0f3460;
-            color: white;
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
-            font-size: 16px;
+            height: 160px;
+            background: var(--bg-input);
+            color: var(--text);
+            border: 2px solid transparent;
+            border-radius: var(--radius-sm);
+            padding: 14px;
+            font-size: 15px;
             font-family: inherit;
             resize: vertical;
-            margin-bottom: 12px;
+            line-height: 1.6;
+            transition: all 0.3s ease;
+            background-image: linear-gradient(var(--bg-input), var(--bg-input)), 
+                              linear-gradient(135deg, var(--accent), var(--accent-light));
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
         }
-        textarea:focus { outline: none; border-color: var(--primary); }
-        textarea::placeholder { color: #6a6a8a; }
-        .btn-row { display: flex; gap: 8px; margin-bottom: 10px; }
+
+        textarea:focus {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.1);
+        }
+
+        textarea::placeholder { color: #5a5a8a; font-weight: 300; }
+
+        .char-count {
+            text-align: right;
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        /* Buttons */
+        .btn-row { display: flex; gap: 8px; }
+
         .btn {
-            padding: 12px 20px;
+            padding: 11px 16px;
             border: none;
-            border-radius: 12px;
+            border-radius: var(--radius-sm);
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             flex: 1;
-            color: white;
-            transition: all 0.3s;
+            color: var(--text);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
         }
-        .btn:active { transform: scale(0.95); }
-        .btn-primary { background: linear-gradient(45deg, #4A90E2, #67B26F); font-size: 18px; }
-        .btn-secondary { background: #2a2a4a; }
-        .btn-control { background: #2a2a4a; padding: 15px; font-size: 16px; }
-        .btn-large { padding: 18px 30px; font-size: 20px; flex: 2; }
-        .speed-row { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
-        .speed-row label { color: var(--text-light); }
-        #speedValue { color: #4A90E2; font-weight: 700; }
-        .speed-presets { display: flex; gap: 8px; }
-        .speed-btn {
-            flex: 1; padding: 8px; border: 2px solid var(--border);
-            background: transparent; color: white; border-radius: 10px;
-            cursor: pointer; font-weight: 600;
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
         }
-        .speed-btn.active { background: linear-gradient(45deg, #4A90E2, #67B26F); border-color: transparent; }
-        .playback { display: flex; gap: 12px; align-items: center; justify-content: center; margin: 20px 0; }
-        .time-row { display: flex; justify-content: space-between; font-size: 14px; color: var(--text-light); margin-bottom: 5px; }
+
+        .btn:active::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn:active { transform: scale(0.96); }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            font-size: 17px;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-icon {
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 13px;
+            font-size: 18px;
+            flex: 0;
+            min-width: 48px;
+        }
+
+        .btn-large { 
+            padding: 15px 24px; 
+            font-size: 17px; 
+            flex: 2;
+            border-radius: 16px;
+        }
+
+        /* Voice selector */
+        .voice-selector {
+            margin-bottom: 14px;
+        }
+
+        .voice-selector label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        select {
+            width: 100%;
+            padding: 11px 14px;
+            background: var(--bg-input);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-family: inherit;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='white' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        /* Speed control */
+        .speed-section { margin-bottom: 14px; }
+
+        .speed-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .speed-label span:first-child {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .speed-value {
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
         input[type="range"] {
-            width: 100%; margin: 10px 0; -webkit-appearance: none;
-            appearance: none; height: 8px; background: #2a2a4a; border-radius: 4px;
+            width: 100%;
+            margin: 6px 0 10px;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            outline: none;
         }
+
         input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none; appearance: none;
-            width: 24px; height: 24px;
-            background: linear-gradient(45deg, #4A90E2, #67B26F);
-            border-radius: 50%; cursor: pointer;
+            -webkit-appearance: none;
+            appearance: none;
+            width: 26px;
+            height: 26px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(108, 92, 231, 0.4);
+            border: 3px solid var(--bg-card);
         }
-        .history-section { background: var(--card-bg); border-radius: 16px; padding: 20px; }
-        .history-section h2 { margin-bottom: 16px; }
-        .history-list { max-height: 300px; overflow-y: auto; margin-bottom: 12px; }
-        .empty-state { text-align: center; color: var(--text-light); padding: 20px; }
+
+        .speed-presets {
+            display: flex;
+            gap: 6px;
+        }
+
+        .speed-btn {
+            flex: 1;
+            padding: 9px 6px;
+            border: 2px solid var(--border);
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .speed-btn.active {
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 12px rgba(108, 92, 231, 0.3);
+        }
+
+        /* Playback */
+        .playback { 
+            display: flex; 
+            gap: 10px; 
+            align-items: center; 
+            justify-content: center; 
+            margin: 16px 0; 
+        }
+
+        /* Progress */
+        .progress-section { margin-top: 8px; }
+
+        .time-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            cursor: pointer;
+            position: relative;
+            overflow: visible;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-light));
+            border-radius: 2px;
+            transition: width 0.1s linear;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            right: -6px;
+            top: -4px;
+            width: 12px;
+            height: 12px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        /* History */
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .history-header h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge {
+            background: var(--accent);
+            padding: 2px 9px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .history-list { 
+            max-height: 300px; 
+            overflow-y: auto; 
+            margin-bottom: 10px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) transparent;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .history-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .history-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .history-list::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 2px;
+        }
+
+        .empty-state { 
+            text-align: center; 
+            color: var(--text-secondary); 
+            padding: 25px 16px; 
+            font-size: 14px;
+        }
+
+        .empty-state .icon {
+            font-size: 36px;
+            display: block;
+            margin-bottom: 8px;
+            opacity: 0.5;
+        }
+
         .history-item {
-            background: #0f3460; border-radius: 12px; padding: 16px;
-            margin-bottom: 8px; cursor: pointer; border-left: 4px solid #4A90E2;
+            background: var(--bg-input);
+            border-radius: var(--radius-sm);
+            padding: 13px;
+            margin-bottom: 7px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            position: relative;
+            -webkit-tap-highlight-color: transparent;
         }
-        .history-item:active { background: #1a1a4e; transform: translateX(5px); }
-        .history-item .preview { font-size: 14px; margin-bottom: 4px; line-height: 1.4; }
-        .history-item .meta { font-size: 12px; color: var(--text-light); }
+
+        .history-item:active {
+            border-color: var(--accent);
+            transform: translateX(3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .history-item .preview { 
+            font-size: 13px; 
+            margin-bottom: 5px; 
+            line-height: 1.5;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .history-item .meta { 
+            font-size: 10px; 
+            color: var(--text-secondary);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .history-item .meta .dot {
+            width: 5px;
+            height: 5px;
+            background: var(--accent-light);
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            width: 100%;
+        }
+
+        /* Pulse animation for playing */
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3); }
+            50% { box-shadow: 0 4px 25px rgba(108, 92, 231, 0.6); }
+        }
+
+        .playing {
+            animation: pulse 2s infinite;
+        }
+
+        /* ============ IPHONE FIXES ============ */
+        @supports (padding: max(0px)) {
+            body {
+                padding-top: max(16px, env(safe-area-inset-top));
+                padding-bottom: max(16px, env(safe-area-inset-bottom));
+                padding-left: max(16px, env(safe-area-inset-left));
+                padding-right: max(16px, env(safe-area-inset-right));
+            }
+        }
+
+        /* Previeni bounce scroll su iOS */
+        html {
+            height: 100%;
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+        }
+        
+        body {
+            height: 100%;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            position: relative;
+        }
+
+        /* Responsive */
+        @media (max-width: 400px) {
+            .card { padding: 14px; }
+            h1 { font-size: 1.5rem; }
+            .btn-large { font-size: 15px; padding: 14px 20px; }
+            textarea { height: 140px; }
+            .history-list { max-height: 250px; }
+        }
+
+        @media (min-width: 768px) {
+            body {
+                display: flex;
+                align-items: flex-start;
+                justify-content: center;
+                padding-top: 40px;
+            }
+            .container { width: 520px; }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>🎙️ Formentis Speak</h1>
-            <p class="subtitle">Ascolta i tuoi testi mentre guidi</p>
+            <div class="logo">🎙️</div>
+            <h1>Formentis Speak</h1>
+            <p class="subtitle">Text-to-Speech intelligente</p>
         </header>
 
+        <!-- Input Card -->
         <div class="card">
-            <textarea id="textInput" placeholder="Incolla qui il tuo testo..."></textarea>
+            <div class="textarea-wrapper">
+                <textarea id="textInput" placeholder="Incolla o scrivi il testo da ascoltare..." oninput="updateCharCount()"></textarea>
+            </div>
+            <div class="char-count">
+                <span id="charCount">0</span> caratteri
+            </div>
             <div class="btn-row">
                 <button class="btn btn-secondary" onclick="pasteText()">📋 Incolla</button>
                 <button class="btn btn-secondary" onclick="clearText()">🗑️ Pulisci</button>
             </div>
         </div>
 
+        <!-- Player Card -->
         <div class="card">
-            <div class="speed-row">
-                <label>Velocità: <span id="speedValue">1.0x</span></label>
-            </div>
-            <input type="range" id="speedSlider" min="0.5" max="3" step="0.1" value="1" oninput="updateSpeed(this.value)">
-            <div class="speed-presets">
-                <button class="speed-btn" onclick="setSpeed(0.75)">0.75x</button>
-                <button class="speed-btn active" onclick="setSpeed(1)">1x</button>
-                <button class="speed-btn" onclick="setSpeed(1.5)">1.5x</button>
-                <button class="speed-btn" onclick="setSpeed(2)">2x</button>
+            <!-- Voice Selection -->
+            <div class="voice-selector">
+                <label>🎤 Voce</label>
+                <select id="voiceSelect" onchange="onVoiceChange()">
+                    <option value="">Caricamento voci...</option>
+                </select>
             </div>
 
+            <!-- Speed Control -->
+            <div class="speed-section">
+                <div class="speed-label">
+                    <span>⚡ Velocità</span>
+                    <span class="speed-value" id="speedValue">1.0x</span>
+                </div>
+                <input type="range" id="speedSlider" min="0.5" max="3" step="0.05" value="1" oninput="updateSpeed(this.value)">
+                <div class="speed-presets">
+                    <button class="speed-btn" onclick="setSpeed(0.75)">0.75x</button>
+                    <button class="speed-btn active" onclick="setSpeed(1)">1x</button>
+                    <button class="speed-btn" onclick="setSpeed(1.5)">1.5x</button>
+                    <button class="speed-btn" onclick="setSpeed(2)">2x</button>
+                </div>
+            </div>
+
+            <!-- Playback Controls -->
             <div class="playback">
-                <button class="btn btn-control" onclick="skip(-10)">⏪ -10s</button>
-                <button class="btn btn-primary btn-large" id="playBtn" onclick="togglePlay()">▶️ Ascolta</button>
-                <button class="btn btn-control" onclick="skip(10)">⏩ +10s</button>
+                <button class="btn btn-icon" onclick="skip(-10)" title="Indietro 10 secondi">⏪</button>
+                <button class="btn btn-primary btn-large" id="playBtn" onclick="togglePlay()">
+                    ▶️ Ascolta
+                </button>
+                <button class="btn btn-icon" onclick="skip(10)" title="Avanti 10 secondi">⏩</button>
             </div>
 
-            <div class="time-row">
-                <span id="currentTime">00:00</span>
-                <span id="totalTime">00:00</span>
+            <!-- Progress Bar -->
+            <div class="progress-section">
+                <div class="time-row">
+                    <span id="currentTime">00:00</span>
+                    <span id="totalTime">00:00</span>
+                </div>
+                <div class="progress-bar" id="progressBar" onclick="seekTo(event)">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
             </div>
-            <input type="range" id="progressSlider" min="0" max="100" value="0" onchange="seekTo(this.value)">
         </div>
 
-        <div class="history-section">
-            <h2>📚 Cronologia</h2>
-            <div class="history-list" id="historyList">
-                <p class="empty-state">Nessun testo ascoltato</p>
+        <!-- History Card -->
+        <div class="card">
+            <div class="history-header">
+                <h2>📚 Cronologia <span class="badge" id="historyCount">0</span></h2>
             </div>
-            <button class="btn btn-secondary" onclick="clearHistory()">🗑️ Pulisci cronologia</button>
+            <div class="history-list" id="historyList">
+                <div class="empty-state">
+                    <span class="icon">📝</span>
+                    Nessun testo ascoltato
+                </div>
+            </div>
+            <button class="btn btn-danger" onclick="clearHistory()">
+                🗑️ Pulisci cronologia
+            </button>
         </div>
     </div>
 
     <script>
+        // ============ APP STATE ============
         let synth = window.speechSynthesis;
         let utterance = null;
         let isPlaying = false;
         let currentSpeed = 1;
         let currentText = '';
+        let currentVoice = null;
+        let availableVoices = [];
         let progressInterval = null;
         let currentProgress = 0;
+        let elapsedSeconds = 0;
 
-        // Carica voci
-        function loadVoices() {
-            synth.getVoices();
-            synth.onvoiceschanged = () => synth.getVoices();
-        }
-        loadVoices();
-
-        // Carica cronologia
+        // ============ HISTORY ============
         let history = JSON.parse(localStorage.getItem('formentisHistory') || '[]');
-        renderHistory();
+
+        // ============ INIT ============
+        function init() {
+            loadVoices();
+            renderHistory();
+            updateCharCount();
+            
+            // Load saved voice preference
+            const savedVoice = localStorage.getItem('formentisVoice');
+            if (savedVoice) {
+                setTimeout(() => {
+                    const select = document.getElementById('voiceSelect');
+                    for (let i = 0; i < select.options.length; i++) {
+                        if (select.options[i].value === savedVoice) {
+                            select.selectedIndex = i;
+                            currentVoice = availableVoices.find(v => v.name === savedVoice);
+                            break;
+                        }
+                    }
+                }, 500);
+            }
+        }
+
+        function loadVoices() {
+            availableVoices = synth.getVoices();
+            
+            if (availableVoices.length === 0) {
+                synth.onvoiceschanged = () => {
+                    availableVoices = synth.getVoices();
+                    populateVoiceList();
+                };
+            } else {
+                populateVoiceList();
+            }
+        }
+
+        function populateVoiceList() {
+            const select = document.getElementById('voiceSelect');
+            
+            // Prioritize high-quality voices
+            const preferredVoices = availableVoices.filter(v => 
+                v.lang.startsWith('it') || 
+                v.name.includes('Google') || 
+                v.name.includes('Enhanced') ||
+                v.name.includes('Premium') ||
+                v.name.includes('Neural')
+            );
+            
+            const otherVoices = availableVoices.filter(v => 
+                !preferredVoices.includes(v)
+            );
+            
+            const sortedVoices = [...preferredVoices, ...otherVoices];
+            
+            select.innerHTML = sortedVoices.map((voice) => {
+                const lang = voice.lang.split('-')[0].toUpperCase();
+                const quality = voice.name.includes('Google') || voice.name.includes('Neural') ? ' ⭐' : '';
+                return `<option value="${voice.name}">${voice.name} (${lang})${quality}</option>`;
+            }).join('');
+            
+            if (sortedVoices.length > 0) {
+                currentVoice = sortedVoices[0];
+            }
+            
+            // Restore saved voice
+            const savedVoice = localStorage.getItem('formentisVoice');
+            if (savedVoice) {
+                for (let i = 0; i < select.options.length; i++) {
+                    if (select.options[i].value === savedVoice) {
+                        select.selectedIndex = i;
+                        currentVoice = availableVoices.find(v => v.name === savedVoice);
+                        break;
+                    }
+                }
+            }
+        }
+
+        function onVoiceChange() {
+            const select = document.getElementById('voiceSelect');
+            const selectedName = select.value;
+            currentVoice = availableVoices.find(v => v.name === selectedName);
+            
+            if (currentVoice) {
+                localStorage.setItem('formentisVoice', currentVoice.name);
+            }
+        }
+
+        // ============ TEXT INPUT ============
+        function updateCharCount() {
+            const text = document.getElementById('textInput').value;
+            document.getElementById('charCount').textContent = text.length;
+        }
 
         async function pasteText() {
             try {
                 const text = await navigator.clipboard.readText();
                 if (text) {
                     document.getElementById('textInput').value = text;
+                    updateCharCount();
                 }
             } catch {
                 alert('Incolla manualmente il testo');
@@ -190,15 +745,18 @@
 
         function clearText() {
             document.getElementById('textInput').value = '';
+            updateCharCount();
+            document.getElementById('textInput').focus();
         }
 
+        // ============ SPEED CONTROL ============
         function updateSpeed(value) {
             currentSpeed = parseFloat(value);
-            document.getElementById('speedValue').textContent = currentSpeed.toFixed(1) + 'x';
+            document.getElementById('speedValue').textContent = currentSpeed.toFixed(2) + 'x';
             
             document.querySelectorAll('.speed-btn').forEach(btn => {
                 btn.classList.remove('active');
-                if (parseFloat(btn.textContent) === currentSpeed) {
+                if (Math.abs(parseFloat(btn.textContent) - currentSpeed) < 0.01) {
                     btn.classList.add('active');
                 }
             });
@@ -209,6 +767,7 @@
             updateSpeed(speed);
         }
 
+        // ============ PLAYBACK ============
         function togglePlay() {
             if (isPlaying) {
                 stopPlayback();
@@ -225,19 +784,32 @@
             }
 
             synth.cancel();
+            stopProgress();
+            
             currentText = text;
+            currentProgress = 0;
+            elapsedSeconds = 0;
+            
             utterance = new SpeechSynthesisUtterance(text);
             utterance.rate = currentSpeed;
             utterance.lang = 'it-IT';
-
-            const voices = synth.getVoices();
-            const italianVoice = voices.find(v => v.lang.startsWith('it'));
-            if (italianVoice) utterance.voice = italianVoice;
-
+            
+            if (currentVoice) {
+                utterance.voice = currentVoice;
+            } else {
+                const italianVoice = availableVoices.find(v => v.lang.startsWith('it'));
+                if (italianVoice) {
+                    utterance.voice = italianVoice;
+                }
+            }
+            
+            utterance.pitch = 1.1;
+            
             utterance.onstart = () => {
                 isPlaying = true;
-                document.getElementById('playBtn').innerHTML = '⏸️ Pausa';
+                updatePlayButton();
                 startProgress();
+                document.getElementById('playBtn').classList.add('playing');
             };
 
             utterance.onend = () => {
@@ -245,8 +817,21 @@
                 addToHistory(text);
             };
 
-            utterance.onerror = () => {
+            utterance.onerror = (e) => {
+                console.error('Speech error:', e);
                 stopPlayback();
+            };
+
+            utterance.onpause = () => {
+                isPlaying = false;
+                updatePlayButton();
+                stopProgress();
+            };
+
+            utterance.onresume = () => {
+                isPlaying = true;
+                updatePlayButton();
+                startProgress();
             };
 
             synth.speak(utterance);
@@ -255,42 +840,66 @@
         function stopPlayback() {
             synth.cancel();
             isPlaying = false;
-            document.getElementById('playBtn').innerHTML = '▶️ Ascolta';
-            if (progressInterval) clearInterval(progressInterval);
+            updatePlayButton();
+            stopProgress();
+            document.getElementById('playBtn').classList.remove('playing');
         }
 
-        function skip(seconds) {
-            if (!isPlaying || !currentText) return;
-            
-            const words = currentText.split(' ');
-            const skipWords = Math.abs(Math.floor(seconds * 2.5));
-            let remainingText;
-            
-            if (seconds > 0) {
-                // Avanza: prendi le parole rimanenti
-                const currentWordIndex = Math.floor((currentProgress / 100) * words.length);
-                const newStart = Math.min(currentWordIndex + skipWords, words.length);
-                remainingText = words.slice(newStart).join(' ');
+        function updatePlayButton() {
+            const btn = document.getElementById('playBtn');
+            if (isPlaying) {
+                btn.innerHTML = '⏸️ Pausa';
+            } else {
+                btn.innerHTML = '▶️ Ascolta';
             }
+        }
+
+        // ============ SKIP ============
+        function skip(seconds) {
+            if (!currentText) return;
             
+            const totalDuration = estimateDuration();
+            const newTime = Math.max(0, Math.min(totalDuration, elapsedSeconds + seconds));
+            const progress = (newTime / totalDuration) * 100;
+            
+            const charIndex = Math.floor((progress / 100) * currentText.length);
+            const remainingText = currentText.substring(charIndex);
+            
+            const wasPlaying = isPlaying;
             stopPlayback();
-            if (remainingText) {
-                document.getElementById('textInput').value = remainingText;
+            
+            document.getElementById('textInput').value = remainingText;
+            updateCharCount();
+            
+            if (wasPlaying) {
                 setTimeout(() => startPlayback(), 50);
             }
         }
 
+        // ============ PROGRESS ============
         function startProgress() {
             const totalDuration = estimateDuration();
             document.getElementById('totalTime').textContent = formatTime(totalDuration);
+            document.getElementById('currentTime').textContent = '00:00';
             
-            let elapsed = 0;
+            elapsedSeconds = 0;
+            
             progressInterval = setInterval(() => {
-                elapsed += 1;
-                currentProgress = Math.min((elapsed / totalDuration) * 100, 100);
-                document.getElementById('progressSlider').value = currentProgress;
-                document.getElementById('currentTime').textContent = formatTime(elapsed);
-            }, 1000);
+                elapsedSeconds += 0.1;
+                const totalDuration = estimateDuration();
+                currentProgress = Math.min((elapsedSeconds / totalDuration) * 100, 100);
+                
+                document.getElementById('progressFill').style.width = currentProgress + '%';
+                document.getElementById('currentTime').textContent = formatTime(elapsedSeconds);
+                document.getElementById('totalTime').textContent = formatTime(totalDuration);
+            }, 100);
+        }
+
+        function stopProgress() {
+            if (progressInterval) {
+                clearInterval(progressInterval);
+                progressInterval = null;
+            }
         }
 
         function estimateDuration() {
@@ -304,29 +913,41 @@
             return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
         }
 
-        function seekTo(percent) {
+        function seekTo(event) {
             if (!currentText) return;
+            
+            const bar = document.getElementById('progressBar');
+            const rect = bar.getBoundingClientRect();
+            const clickX = event.clientX - rect.left;
+            const percent = (clickX / rect.width) * 100;
+            
             const charIndex = Math.floor((percent / 100) * currentText.length);
             const remainingText = currentText.substring(charIndex);
-            document.getElementById('textInput').value = remainingText;
             
-            if (isPlaying) {
-                stopPlayback();
+            const wasPlaying = isPlaying;
+            stopPlayback();
+            
+            document.getElementById('textInput').value = remainingText;
+            updateCharCount();
+            
+            if (wasPlaying) {
                 setTimeout(() => startPlayback(), 50);
             }
         }
 
+        // ============ HISTORY ============
         function addToHistory(text) {
             const entry = {
                 id: Date.now(),
                 text: text,
-                preview: text.substring(0, 100) + (text.length > 100 ? '...' : ''),
+                preview: text.substring(0, 120) + (text.length > 120 ? '...' : ''),
                 timestamp: new Date().toLocaleString('it-IT'),
-                speed: currentSpeed
+                speed: currentSpeed,
+                voice: currentVoice ? currentVoice.name : 'Default'
             };
             
             history.unshift(entry);
-            if (history.length > 50) history = history.slice(0, 50);
+            if (history.length > 100) history = history.slice(0, 100);
             
             localStorage.setItem('formentisHistory', JSON.stringify(history));
             renderHistory();
@@ -334,32 +955,58 @@
 
         function renderHistory() {
             const container = document.getElementById('historyList');
+            const countBadge = document.getElementById('historyCount');
+            
+            countBadge.textContent = history.length;
             
             if (history.length === 0) {
-                container.innerHTML = '<p class="empty-state">Nessun testo ascoltato</p>';
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <span class="icon">📝</span>
+                        Nessun testo ascoltato
+                    </div>`;
                 return;
             }
             
             container.innerHTML = history.map((item, index) => `
                 <div class="history-item" onclick="loadFromHistory(${index})">
-                    <div class="preview">${item.preview}</div>
-                    <div class="meta">${item.timestamp} • ${item.speed.toFixed(1)}x</div>
+                    <div class="preview">${escapeHtml(item.preview)}</div>
+                    <div class="meta">
+                        <span>${item.timestamp}</span>
+                        <span class="dot"></span>
+                        <span>${item.speed.toFixed(1)}x</span>
+                        ${item.voice ? `<span class="dot"></span><span>${item.voice}</span>` : ''}
+                    </div>
                 </div>
             `).join('');
         }
 
         function loadFromHistory(index) {
-            document.getElementById('textInput').value = history[index].text;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            const item = history[index];
+            if (item) {
+                document.getElementById('textInput').value = item.text;
+                updateCharCount();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
         }
 
         function clearHistory() {
+            if (history.length === 0) return;
             if (confirm('Cancellare tutta la cronologia?')) {
                 history = [];
                 localStorage.removeItem('formentisHistory');
                 renderHistory();
             }
         }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ============ START APP ============
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
